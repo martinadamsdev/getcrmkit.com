@@ -25,7 +25,7 @@ async def check_follow_up_reminders(ctx: dict[str, Any]) -> None:
 
 # 注册到 SAQ worker 的 cron_jobs
 follow_up_cron_jobs = [
-    CronJob(
+    CronJob(  # type: ignore[type-var]
         check_follow_up_reminders,
         cron="*/15 * * * *",  # 每 15 分钟
     ),

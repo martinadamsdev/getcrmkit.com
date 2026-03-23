@@ -6,11 +6,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+from app.application.follow_up.commands import CreateFollowUpHandler
 from app.domain.customer.entities import Customer
 from app.domain.customer.exceptions import CustomerNotFoundError
-from app.domain.follow_up.entities import FollowUp
 from app.domain.follow_up.enums import FollowUpMethod
 from app.domain.follow_up.exceptions import FollowUpContentRequiredError
+from app.domain.follow_up.services import FollowUpService
 
 
 class TestCreateFollowUpHandler:
@@ -39,12 +40,7 @@ class TestCreateFollowUpHandler:
         return AsyncMock()
 
     @pytest.fixture
-    def handler(
-        self, follow_up_repo: AsyncMock, customer_repo: AsyncMock
-    ) -> "CreateFollowUpHandler":
-        from app.application.follow_up.commands import CreateFollowUpHandler
-        from app.domain.follow_up.services import FollowUpService
-
+    def handler(self, follow_up_repo: AsyncMock, customer_repo: AsyncMock) -> CreateFollowUpHandler:
         service = FollowUpService(follow_up_repo=follow_up_repo)
         return CreateFollowUpHandler(
             follow_up_service=service,
@@ -53,7 +49,7 @@ class TestCreateFollowUpHandler:
 
     async def test_create_follow_up_success(
         self,
-        handler: "CreateFollowUpHandler",
+        handler: CreateFollowUpHandler,
         customer: Customer,
         customer_repo: AsyncMock,
         follow_up_repo: AsyncMock,
@@ -82,7 +78,7 @@ class TestCreateFollowUpHandler:
 
     async def test_create_follow_up_customer_not_found(
         self,
-        handler: "CreateFollowUpHandler",
+        handler: CreateFollowUpHandler,
         customer_repo: AsyncMock,
         tenant_id: uuid.UUID,
         user_id: uuid.UUID,
@@ -100,7 +96,7 @@ class TestCreateFollowUpHandler:
 
     async def test_create_follow_up_empty_content(
         self,
-        handler: "CreateFollowUpHandler",
+        handler: CreateFollowUpHandler,
         customer: Customer,
         customer_repo: AsyncMock,
         tenant_id: uuid.UUID,
@@ -119,7 +115,7 @@ class TestCreateFollowUpHandler:
 
     async def test_create_follow_up_with_all_fields(
         self,
-        handler: "CreateFollowUpHandler",
+        handler: CreateFollowUpHandler,
         customer: Customer,
         customer_repo: AsyncMock,
         follow_up_repo: AsyncMock,

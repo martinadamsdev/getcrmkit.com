@@ -6,8 +6,14 @@ from app.domain.follow_up.enums import FollowUpMethod, ScriptScene
 class TestFollowUpMethod:
     def test_all_values(self):
         expected = {
-            "phone", "email", "wechat", "whatsapp",
-            "alibaba", "meeting", "exhibition", "other",
+            "phone",
+            "email",
+            "wechat",
+            "whatsapp",
+            "alibaba",
+            "meeting",
+            "exhibition",
+            "other",
         }
         assert {m.value for m in FollowUpMethod} == expected
 
@@ -23,8 +29,13 @@ class TestFollowUpMethod:
 class TestScriptScene:
     def test_all_values(self):
         expected = {
-            "first_contact", "follow_up", "quotation", "sample",
-            "order_confirm", "after_sales", "reactivation",
+            "first_contact",
+            "follow_up",
+            "quotation",
+            "sample",
+            "order_confirm",
+            "after_sales",
+            "reactivation",
         }
         assert {s.value for s in ScriptScene} == expected
 
