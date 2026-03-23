@@ -5,6 +5,7 @@ Revises: 5c899c658874
 Create Date: 2026-03-23 04:30:41.545555
 
 """
+
 from collections.abc import Sequence
 
 import sqlalchemy as sa
@@ -126,15 +127,23 @@ def upgrade() -> None:
     op.create_index("idx_customers_owner", "customers", ["owner_id"], postgresql_where=sa.text("deleted_at IS NULL"))
     op.create_index("idx_customers_grade", "customers", ["grade_id"], postgresql_where=sa.text("deleted_at IS NULL"))
     op.create_index("idx_customers_source", "customers", ["source"], postgresql_where=sa.text("deleted_at IS NULL"))
-    op.create_index("idx_customers_last_follow", "customers", ["last_follow_at"], postgresql_where=sa.text("deleted_at IS NULL"))
-    op.execute("CREATE INDEX idx_customers_name_trgm ON customers USING GIN (name gin_trgm_ops) WHERE deleted_at IS NULL")
+    op.create_index(
+        "idx_customers_last_follow", "customers", ["last_follow_at"], postgresql_where=sa.text("deleted_at IS NULL")
+    )
+    op.execute(
+        "CREATE INDEX idx_customers_name_trgm ON customers USING GIN (name gin_trgm_ops) WHERE deleted_at IS NULL"
+    )
 
     # contacts indexes
-    op.create_index("idx_contacts_customer", "contacts", ["customer_id"], postgresql_where=sa.text("deleted_at IS NULL"))
+    op.create_index(
+        "idx_contacts_customer", "contacts", ["customer_id"], postgresql_where=sa.text("deleted_at IS NULL")
+    )
     op.create_index("idx_contacts_email", "contacts", ["email"], postgresql_where=sa.text("deleted_at IS NULL"))
 
     # tags unique index (expression-based for COALESCE)
-    op.execute("CREATE UNIQUE INDEX idx_tags_tenant_name ON tags (tenant_id, name, COALESCE(group_name, '')) WHERE deleted_at IS NULL")
+    op.execute(
+        "CREATE UNIQUE INDEX idx_tags_tenant_name ON tags (tenant_id, name, COALESCE(group_name, '')) WHERE deleted_at IS NULL"
+    )
 
     # customer_grades index
     op.create_index("idx_grades_tenant", "customer_grades", ["tenant_id"])

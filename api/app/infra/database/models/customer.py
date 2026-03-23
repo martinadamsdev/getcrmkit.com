@@ -71,9 +71,7 @@ class ContactModel(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
     tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
-    customer_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False
-    )
+    customer_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     title: Mapped[str | None] = mapped_column(String(100), nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), nullable=True)

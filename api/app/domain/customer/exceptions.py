@@ -34,3 +34,23 @@ class DuplicateTagError(DomainError):
 class GradeInUseError(DomainError):
     def __init__(self, grade_id: str) -> None:
         super().__init__(message=f"Grade is in use by customers: {grade_id}", code="GRADE_IN_USE")
+
+
+class SavedViewNotFoundError(DomainError):
+    def __init__(self, view_id: str) -> None:
+        super().__init__(message=f"Saved view not found: {view_id}", code="SAVED_VIEW_NOT_FOUND")
+
+
+class DuplicateViewNameError(DomainError):
+    def __init__(self, name: str) -> None:
+        super().__init__(message=f"Saved view name already exists: {name}", code="DUPLICATE_VIEW_NAME")
+
+
+class DataJobNotFoundError(DomainError):
+    def __init__(self, job_id: str) -> None:
+        super().__init__(message=f"Data job not found: {job_id}", code="DATA_JOB_NOT_FOUND")
+
+
+class InvalidImportFileError(DomainError):
+    def __init__(self, file_name: str) -> None:
+        super().__init__(message=f"Invalid import file: {file_name}", code="INVALID_IMPORT_FILE")

@@ -309,9 +309,7 @@ class TestCustomers:
         assert any(t["id"] == tag_id for t in tags)
 
         # Untag
-        response = await authenticated_client.delete(
-            f"/api/v1/customers/{customer_id}/tags/{tag_id}"
-        )
+        response = await authenticated_client.delete(f"/api/v1/customers/{customer_id}/tags/{tag_id}")
         assert response.status_code == 204
 
         detail = await authenticated_client.get(f"/api/v1/customers/{customer_id}")

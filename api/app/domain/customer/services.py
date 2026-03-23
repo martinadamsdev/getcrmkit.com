@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from app.domain.customer.entities import Contact, Customer, CustomerGrade, Tag
+from app.domain.customer.entities import Contact, Customer, CustomerGrade, SavedView, Tag
 from app.domain.customer.events import CustomerGradeChanged
 from app.domain.customer.exceptions import (
     ContactNotFoundError,
@@ -11,15 +11,19 @@ from app.domain.customer.exceptions import (
     CustomerNameRequiredError,
     CustomerNotFoundError,
     DuplicateTagError,
+    DuplicateViewNameError,
     GradeInUseError,
+    SavedViewNotFoundError,
     TagNotFoundError,
 )
 from app.domain.customer.repository import (
     AbstractContactRepository,
     AbstractCustomerGradeRepository,
     AbstractCustomerRepository,
+    AbstractSavedViewRepository,
     AbstractTagRepository,
 )
+from app.domain.customer.value_objects import CustomerFilter, DuplicateMatch
 
 
 class CustomerGradeService:
@@ -141,9 +145,13 @@ class CustomerService:
         return customer
 
     async def list_customers(
-        self, tenant_id: uuid.UUID, page: int, page_size: int
+        self,
+        tenant_id: uuid.UUID,
+        page: int,
+        page_size: int,
+        filters: CustomerFilter | None = None,
     ) -> tuple[list[Customer], int]:
-        return await self._repo.get_by_tenant(tenant_id, page, page_size)
+        return await self._repo.get_by_tenant(tenant_id, page, page_size, filters=filters)
 
     async def soft_delete_customer(self, *, tenant_id: uuid.UUID, customer_id: uuid.UUID) -> None:
         customer = await self._repo.get_by_id(tenant_id, customer_id)
@@ -293,3 +301,108 @@ class TagService:
 
     async def get_tags_for_customer(self, tenant_id: uuid.UUID, customer_id: uuid.UUID) -> list[Tag]:
         return await self._repo.get_by_customer_id(tenant_id, customer_id)
+
+
+class DuplicateChecker:
+    PUBLIC_DOMAINS = frozenset(
+        {
+            "gmail.com",
+            "hotmail.com",
+            "yahoo.com",
+            "outlook.com",
+            "163.com",
+            "126.com",
+            "qq.com",
+            "foxmail.com",
+            "icloud.com",
+            "aol.com",
+            "mail.com",
+            "protonmail.com",
+        }
+    )
+
+    def __init__(self, customer_repo: AbstractCustomerRepository) -> None:
+        self._repo = customer_repo
+
+    async def check(
+        self,
+        tenant_id: uuid.UUID,
+        name: str,
+        email: str | None = None,
+        exclude_id: uuid.UUID | None = None,
+    ) -> list[DuplicateMatch]:
+        seen: dict[uuid.UUID, DuplicateMatch] = {}
+        name_matches = await self._repo.find_by_name_exact(tenant_id, name, exclude_id)
+        for c in name_matches:
+            if c.id not in seen:
+                seen[c.id] = DuplicateMatch(
+                    customer_id=c.id, customer_name=c.name, match_type="name_exact", matched_value=c.name
+                )
+        if email:
+            domain = email.split("@")[-1].lower() if "@" in email else None
+            if domain and domain not in self.PUBLIC_DOMAINS:
+                domain_matches = await self._repo.find_by_email_domain(tenant_id, domain, exclude_id)
+                for c in domain_matches:
+                    if c.id not in seen:
+                        seen[c.id] = DuplicateMatch(
+                            customer_id=c.id, customer_name=c.name, match_type="email_domain", matched_value=domain
+                        )
+            exact_matches = await self._repo.find_by_email_exact(tenant_id, email, exclude_id)
+            for c in exact_matches:
+                if c.id not in seen:
+                    seen[c.id] = DuplicateMatch(
+                        customer_id=c.id, customer_name=c.name, match_type="email_exact", matched_value=email
+                    )
+        return list(seen.values())
+
+
+class SavedViewService:
+    def __init__(self, repo: AbstractSavedViewRepository) -> None:
+        self._repo = repo
+
+    async def create_view(
+        self,
+        *,
+        tenant_id: uuid.UUID,
+        user_id: uuid.UUID,
+        name: str,
+        entity_type: str,
+        filter_config: dict[str, Any],
+        is_default: bool = False,
+        position: int = 0,
+    ) -> SavedView:
+        existing = await self._repo.get_by_name(tenant_id, user_id, entity_type, name)
+        if existing:
+            raise DuplicateViewNameError(name)
+        view = SavedView(
+            tenant_id=tenant_id,
+            user_id=user_id,
+            entity_type=entity_type,
+            name=name,
+            filter_config=filter_config,
+            is_default=is_default,
+            position=position,
+            created_by=user_id,
+        )
+        return await self._repo.create(view)
+
+    async def update_view(self, *, id: uuid.UUID, tenant_id: uuid.UUID, user_id: uuid.UUID, **kwargs: Any) -> SavedView:
+        view = await self._repo.get_by_id(tenant_id, user_id, id)
+        if view is None:
+            raise SavedViewNotFoundError(str(id))
+        if "name" in kwargs:
+            existing = await self._repo.get_by_name(tenant_id, user_id, view.entity_type, kwargs["name"])
+            if existing and existing.id != view.id:
+                raise DuplicateViewNameError(kwargs["name"])
+        for key, value in kwargs.items():
+            setattr(view, key, value)
+        return await self._repo.update(view)
+
+    async def delete_view(self, *, id: uuid.UUID, tenant_id: uuid.UUID, user_id: uuid.UUID) -> None:
+        view = await self._repo.get_by_id(tenant_id, user_id, id)
+        if view is None:
+            raise SavedViewNotFoundError(str(id))
+        await self._repo.delete(tenant_id, user_id, id)
+
+    async def get_all(self, *, tenant_id: uuid.UUID, user_id: uuid.UUID, entity_type: str) -> list[SavedView]:
+        return await self._repo.get_all(tenant_id, user_id, entity_type)

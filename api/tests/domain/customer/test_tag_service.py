@@ -26,7 +26,12 @@ class TestTagService:
         mock_tag_repo.get_by_name_and_group.return_value = None
         mock_tag_repo.create.return_value = Tag(name="VIP", tenant_id=uid)
         result = await tag_service.create_tag(
-            name="VIP", group_name=None, color="#FF0000", position=0, tenant_id=uid, created_by=created_by,
+            name="VIP",
+            group_name=None,
+            color="#FF0000",
+            position=0,
+            tenant_id=uid,
+            created_by=created_by,
         )
         assert result.name == "VIP"
 
@@ -36,7 +41,12 @@ class TestTagService:
         mock_tag_repo.get_by_name_and_group.return_value = Tag(name="VIP")
         with pytest.raises(DuplicateTagError):
             await tag_service.create_tag(
-                name="VIP", group_name=None, color="#FF0000", position=0, tenant_id=uid, created_by=created_by,
+                name="VIP",
+                group_name=None,
+                color="#FF0000",
+                position=0,
+                tenant_id=uid,
+                created_by=created_by,
             )
 
     async def test_update_tag_success(self, tag_service, mock_tag_repo):

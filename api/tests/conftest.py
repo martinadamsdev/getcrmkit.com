@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from unittest.mock import AsyncMock
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -35,9 +36,10 @@ async def redis(settings) -> AsyncGenerator[Redis]:
 
 @pytest.fixture
 async def client(settings) -> AsyncGenerator[AsyncClient]:
+    from app.application.shared.task_queue import AbstractTaskQueue
     from app.application.shared.unit_of_work import AbstractUnitOfWork
     from app.infra.database.unit_of_work import SqlAlchemyUnitOfWork
-    from app.interfaces.api.deps import get_db, get_redis, get_uow
+    from app.interfaces.api.deps import get_db, get_redis, get_task_queue, get_uow
     from app.main import create_app
 
     test_engine = create_async_engine(settings.database_url, poolclass=NullPool)
@@ -61,9 +63,15 @@ async def client(settings) -> AsyncGenerator[AsyncClient]:
         uow.session = session
         yield uow
 
+    mock_task_queue = AsyncMock(spec=AbstractTaskQueue)
+
+    def override_get_task_queue() -> AbstractTaskQueue:
+        return mock_task_queue
+
     app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[get_redis] = override_get_redis
     app.dependency_overrides[get_uow] = override_get_uow
+    app.dependency_overrides[get_task_queue] = override_get_task_queue
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:

@@ -8,6 +8,8 @@ from app.interfaces.api.v1.auth import router as auth_router
 from app.interfaces.api.v1.contacts import router as contacts_router
 from app.interfaces.api.v1.customer_grades import router as customer_grades_router
 from app.interfaces.api.v1.customers import router as customers_router
+from app.interfaces.api.v1.data_jobs import router as data_jobs_router
+from app.interfaces.api.v1.saved_views import router as saved_views_router
 from app.interfaces.api.v1.system import router as system_router
 from app.interfaces.api.v1.tags import customer_tags_router
 from app.interfaces.api.v1.tags import router as tags_router
@@ -23,7 +25,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Get CRM Kit API",
         description="Open-source CRM for international trade SOHO",
-        version="0.2.0",
+        version="0.4.0",
         lifespan=lifespan,
     )
     app.include_router(system_router)
@@ -33,6 +35,8 @@ def create_app() -> FastAPI:
     app.include_router(customer_tags_router)
     app.include_router(customers_router)
     app.include_router(contacts_router)
+    app.include_router(saved_views_router)
+    app.include_router(data_jobs_router)
     return app
 
 

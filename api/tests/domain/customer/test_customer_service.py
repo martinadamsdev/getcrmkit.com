@@ -30,7 +30,10 @@ class TestCustomerService:
         uid = uuid.uuid7()
         mock_customer_repo.create.return_value = make_customer("Acme")
         result = await customer_service.create_customer(
-            name="Acme", tenant_id=uid, created_by=uid, owner_id=uid,
+            name="Acme",
+            tenant_id=uid,
+            created_by=uid,
+            owner_id=uid,
         )
         mock_customer_repo.create.assert_called_once()
         assert result.name == "Acme"
@@ -43,9 +46,11 @@ class TestCustomerService:
     async def test_create_customer_auto_owner_id(self, customer_service, mock_customer_repo):
         uid = uuid.uuid7()
         captured = {}
+
         async def capture_create(customer):
             captured["owner_id"] = customer.owner_id
             return customer
+
         mock_customer_repo.create.side_effect = capture_create
         await customer_service.create_customer(name="Test", tenant_id=uid, created_by=uid, owner_id=uid)
         assert captured["owner_id"] == uid
@@ -58,7 +63,9 @@ class TestCustomerService:
         mock_customer_repo.get_by_id.return_value = existing
         mock_customer_repo.update.return_value = updated
         result = await customer_service.update_customer(
-            tenant_id=uid, customer_id=customer_id, name="New Name",
+            tenant_id=uid,
+            customer_id=customer_id,
+            name="New Name",
         )
         assert result.name == "New Name"
 
@@ -90,7 +97,9 @@ class TestCustomerService:
         mock_customer_repo.get_by_id.return_value = existing
         mock_customer_repo.update.return_value = updated
         result = await customer_service.update_customer(
-            tenant_id=uid, customer_id=uuid.uuid7(), grade_id=new_grade_id,
+            tenant_id=uid,
+            customer_id=uuid.uuid7(),
+            grade_id=new_grade_id,
         )
         # Event should be recorded on the updated entity
         all_events = result.pull_events()
@@ -107,7 +116,9 @@ class TestCustomerService:
         mock_customer_repo.get_by_id.return_value = existing
         mock_customer_repo.update.return_value = updated
         result = await customer_service.update_customer(
-            tenant_id=uid, customer_id=uuid.uuid7(), grade_id=grade_id,
+            tenant_id=uid,
+            customer_id=uuid.uuid7(),
+            grade_id=grade_id,
         )
         all_events = result.pull_events()
         events = [e for e in all_events if isinstance(e, CustomerGradeChanged)]

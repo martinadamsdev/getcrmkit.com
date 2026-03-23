@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import exists, func, select
+from sqlalchemy import exists, func, literal_column, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.customer.entities import Contact, Customer, CustomerGrade, Tag
@@ -14,6 +14,7 @@ from app.domain.customer.repository import (
     AbstractCustomerRepository,
     AbstractTagRepository,
 )
+from app.domain.customer.value_objects import CustomerFilter
 from app.infra.database.models.customer import (
     ContactModel,
     CustomerGradeModel,
@@ -21,6 +22,12 @@ from app.infra.database.models.customer import (
     TagModel,
     customer_tags_table,
 )
+
+SORT_COLUMNS: dict[str, object] = {
+    "created_at": CustomerModel.created_at,
+    "name": CustomerModel.name,
+    "last_follow_at": CustomerModel.last_follow_at,
+}
 
 
 class CustomerGradeRepository(AbstractCustomerGradeRepository):
@@ -139,19 +146,59 @@ class CustomerRepository(AbstractCustomerRepository):
         model = result.scalar_one_or_none()
         return self._to_entity(model) if model else None
 
-    async def get_by_tenant(self, tenant_id: uuid.UUID, page: int, page_size: int) -> tuple[list[Customer], int]:
-        count_stmt = select(func.count()).where(
+    async def get_by_tenant(
+        self, tenant_id: uuid.UUID, page: int, page_size: int, filters: CustomerFilter | None = None
+    ) -> tuple[list[Customer], int]:
+        conditions = [
             CustomerModel.tenant_id == tenant_id,
             CustomerModel.deleted_at.is_(None),
-        )
+        ]
+
+        if filters is not None:
+            if filters.keyword:
+                conditions.append(CustomerModel.name.op("%")(filters.keyword))
+            if filters.grade_id is not None:
+                conditions.append(CustomerModel.grade_id == filters.grade_id)
+            if filters.source is not None:
+                conditions.append(CustomerModel.source == filters.source)
+            if filters.follow_status is not None:
+                conditions.append(CustomerModel.follow_status == filters.follow_status.value)
+            if filters.country is not None:
+                conditions.append(CustomerModel.country == filters.country)
+            if filters.industry is not None:
+                conditions.append(CustomerModel.industry == filters.industry)
+            if filters.owner_id is not None:
+                conditions.append(CustomerModel.owner_id == filters.owner_id)
+            if filters.tag_ids:
+                conditions.append(
+                    exists(
+                        select(customer_tags_table.c.customer_id).where(
+                            customer_tags_table.c.customer_id == CustomerModel.id,
+                            customer_tags_table.c.tag_id.in_(filters.tag_ids),
+                        )
+                    )
+                )
+            if filters.created_at_from is not None:
+                conditions.append(CustomerModel.created_at >= filters.created_at_from)
+            if filters.created_at_to is not None:
+                conditions.append(CustomerModel.created_at <= filters.created_at_to)
+            if filters.last_follow_at_from is not None:
+                conditions.append(CustomerModel.last_follow_at >= filters.last_follow_at_from)
+            if filters.last_follow_at_to is not None:
+                conditions.append(CustomerModel.last_follow_at <= filters.last_follow_at_to)
+
+        count_stmt = select(func.count()).select_from(CustomerModel).where(*conditions)
         total = (await self._session.execute(count_stmt)).scalar_one()
+
+        # Sort
+        sort_col = SORT_COLUMNS.get(filters.sort_by if filters else "created_at", CustomerModel.created_at)
+        sort_order = filters.sort_order if filters else "desc"
+        order_clause = sort_col.asc() if sort_order == "asc" else sort_col.desc()  # type: ignore[attr-defined]
+
         stmt = (
             select(CustomerModel)
-            .where(
-                CustomerModel.tenant_id == tenant_id,
-                CustomerModel.deleted_at.is_(None),
-            )
-            .order_by(CustomerModel.created_at.desc())
+            .where(*conditions)
+            .order_by(order_clause)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )
@@ -201,6 +248,76 @@ class CustomerRepository(AbstractCustomerRepository):
         model = result.scalar_one()
         model.deleted_at = datetime.now(UTC)
         await self._session.flush()
+
+    async def find_by_name_exact(
+        self, tenant_id: uuid.UUID, name: str, exclude_id: uuid.UUID | None = None
+    ) -> list[Customer]:
+        conditions = [
+            func.lower(func.trim(CustomerModel.name)) == func.lower(func.trim(name)),
+            CustomerModel.tenant_id == tenant_id,
+            CustomerModel.deleted_at.is_(None),
+        ]
+        if exclude_id is not None:
+            conditions.append(CustomerModel.id != exclude_id)
+        stmt = select(CustomerModel).where(*conditions)
+        result = await self._session.execute(stmt)
+        return [self._to_entity(m) for m in result.scalars()]
+
+    async def find_by_email_domain(
+        self, tenant_id: uuid.UUID, domain: str, exclude_id: uuid.UUID | None = None
+    ) -> list[Customer]:
+        id_conditions = [
+            func.split_part(ContactModel.email, literal_column("'@'"), 2) == domain,
+            ContactModel.deleted_at.is_(None),
+            CustomerModel.tenant_id == tenant_id,
+            CustomerModel.deleted_at.is_(None),
+        ]
+        if exclude_id is not None:
+            id_conditions.append(CustomerModel.id != exclude_id)
+        id_subq = (
+            select(CustomerModel.id)
+            .join(ContactModel, ContactModel.customer_id == CustomerModel.id)
+            .where(*id_conditions)
+            .distinct()
+            .subquery()
+        )
+        stmt = select(CustomerModel).where(CustomerModel.id.in_(select(id_subq)))
+        result = await self._session.execute(stmt)
+        return [self._to_entity(m) for m in result.scalars()]
+
+    async def find_by_email_exact(
+        self, tenant_id: uuid.UUID, email: str, exclude_id: uuid.UUID | None = None
+    ) -> list[Customer]:
+        id_conditions = [
+            ContactModel.email == email,
+            ContactModel.deleted_at.is_(None),
+            CustomerModel.tenant_id == tenant_id,
+            CustomerModel.deleted_at.is_(None),
+        ]
+        if exclude_id is not None:
+            id_conditions.append(CustomerModel.id != exclude_id)
+        id_subq = (
+            select(CustomerModel.id)
+            .join(ContactModel, ContactModel.customer_id == CustomerModel.id)
+            .where(*id_conditions)
+            .distinct()
+            .subquery()
+        )
+        stmt = select(CustomerModel).where(CustomerModel.id.in_(select(id_subq)))
+        result = await self._session.execute(stmt)
+        return [self._to_entity(m) for m in result.scalars()]
+
+    async def count_by_tenant(self, tenant_id: uuid.UUID) -> int:
+        stmt = (
+            select(func.count())
+            .select_from(CustomerModel)
+            .where(
+                CustomerModel.tenant_id == tenant_id,
+                CustomerModel.deleted_at.is_(None),
+            )
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one()
 
     @staticmethod
     def _to_model(customer: Customer) -> CustomerModel:
@@ -468,10 +585,14 @@ class TagRepository(AbstractTagRepository):
     async def add_to_customer(self, tenant_id: uuid.UUID, customer_id: uuid.UUID, tag_id: uuid.UUID) -> None:
         from sqlalchemy.dialects.postgresql import insert
 
-        stmt = insert(customer_tags_table).values(
-            customer_id=customer_id,
-            tag_id=tag_id,
-        ).on_conflict_do_nothing()
+        stmt = (
+            insert(customer_tags_table)
+            .values(
+                customer_id=customer_id,
+                tag_id=tag_id,
+            )
+            .on_conflict_do_nothing()
+        )
         await self._session.execute(stmt)
         await self._session.flush()
 

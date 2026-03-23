@@ -31,8 +31,12 @@ class TestCustomerGradeService:
         mock_grade = CustomerGrade(name="S", tenant_id=tenant_id)
         mock_grade_repo.create.return_value = mock_grade
         result = await grade_service.create_grade(
-            name="S", label="超级VIP", color="#FF0000", position=0,
-            tenant_id=tenant_id, created_by=created_by,
+            name="S",
+            label="超级VIP",
+            color="#FF0000",
+            position=0,
+            tenant_id=tenant_id,
+            created_by=created_by,
         )
         mock_grade_repo.create.assert_called_once()
         assert result.name == "S"

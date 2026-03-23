@@ -22,7 +22,7 @@ async def health_check(
 
     redis_status = "connected"
     try:
-        await redis.ping()
+        await redis.ping()  # type: ignore[misc]
     except Exception:
         redis_status = "disconnected"
 

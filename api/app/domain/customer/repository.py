@@ -3,7 +3,8 @@ from __future__ import annotations
 import uuid
 from abc import ABC, abstractmethod
 
-from app.domain.customer.entities import Contact, Customer, CustomerGrade, Tag
+from app.domain.customer.entities import Contact, Customer, CustomerGrade, DataJob, SavedView, Tag
+from app.domain.customer.value_objects import CustomerFilter
 
 
 class AbstractCustomerGradeRepository(ABC):
@@ -35,7 +36,11 @@ class AbstractCustomerRepository(ABC):
 
     @abstractmethod
     async def get_by_tenant(
-        self, tenant_id: uuid.UUID, page: int, page_size: int
+        self,
+        tenant_id: uuid.UUID,
+        page: int,
+        page_size: int,
+        filters: CustomerFilter | None = None,
     ) -> tuple[list[Customer], int]: ...
 
     @abstractmethod
@@ -43,6 +48,24 @@ class AbstractCustomerRepository(ABC):
 
     @abstractmethod
     async def soft_delete(self, tenant_id: uuid.UUID, customer_id: uuid.UUID) -> None: ...
+
+    @abstractmethod
+    async def find_by_name_exact(
+        self, tenant_id: uuid.UUID, name: str, exclude_id: uuid.UUID | None = None
+    ) -> list[Customer]: ...
+
+    @abstractmethod
+    async def find_by_email_domain(
+        self, tenant_id: uuid.UUID, domain: str, exclude_id: uuid.UUID | None = None
+    ) -> list[Customer]: ...
+
+    @abstractmethod
+    async def find_by_email_exact(
+        self, tenant_id: uuid.UUID, email: str, exclude_id: uuid.UUID | None = None
+    ) -> list[Customer]: ...
+
+    @abstractmethod
+    async def count_by_tenant(self, tenant_id: uuid.UUID) -> int: ...
 
 
 class AbstractContactRepository(ABC):
@@ -76,9 +99,7 @@ class AbstractTagRepository(ABC):
     async def get_all(self, tenant_id: uuid.UUID) -> list[Tag]: ...
 
     @abstractmethod
-    async def get_by_name_and_group(
-        self, tenant_id: uuid.UUID, name: str, group_name: str | None
-    ) -> Tag | None: ...
+    async def get_by_name_and_group(self, tenant_id: uuid.UUID, name: str, group_name: str | None) -> Tag | None: ...
 
     @abstractmethod
     async def update(self, tag: Tag) -> Tag: ...
@@ -87,14 +108,43 @@ class AbstractTagRepository(ABC):
     async def delete(self, tenant_id: uuid.UUID, tag_id: uuid.UUID) -> None: ...
 
     @abstractmethod
-    async def add_to_customer(
-        self, tenant_id: uuid.UUID, customer_id: uuid.UUID, tag_id: uuid.UUID
-    ) -> None: ...
+    async def add_to_customer(self, tenant_id: uuid.UUID, customer_id: uuid.UUID, tag_id: uuid.UUID) -> None: ...
 
     @abstractmethod
-    async def remove_from_customer(
-        self, tenant_id: uuid.UUID, customer_id: uuid.UUID, tag_id: uuid.UUID
-    ) -> None: ...
+    async def remove_from_customer(self, tenant_id: uuid.UUID, customer_id: uuid.UUID, tag_id: uuid.UUID) -> None: ...
 
     @abstractmethod
     async def get_by_customer_id(self, tenant_id: uuid.UUID, customer_id: uuid.UUID) -> list[Tag]: ...
+
+
+class AbstractSavedViewRepository(ABC):
+    @abstractmethod
+    async def create(self, view: SavedView) -> SavedView: ...
+
+    @abstractmethod
+    async def get_by_id(self, tenant_id: uuid.UUID, user_id: uuid.UUID, view_id: uuid.UUID) -> SavedView | None: ...
+
+    @abstractmethod
+    async def get_all(self, tenant_id: uuid.UUID, user_id: uuid.UUID, entity_type: str) -> list[SavedView]: ...
+
+    @abstractmethod
+    async def get_by_name(
+        self, tenant_id: uuid.UUID, user_id: uuid.UUID, entity_type: str, name: str
+    ) -> SavedView | None: ...
+
+    @abstractmethod
+    async def update(self, view: SavedView) -> SavedView: ...
+
+    @abstractmethod
+    async def delete(self, tenant_id: uuid.UUID, user_id: uuid.UUID, view_id: uuid.UUID) -> None: ...
+
+
+class AbstractDataJobRepository(ABC):
+    @abstractmethod
+    async def create(self, job: DataJob) -> DataJob: ...
+
+    @abstractmethod
+    async def get_by_id(self, tenant_id: uuid.UUID, job_id: uuid.UUID) -> DataJob | None: ...
+
+    @abstractmethod
+    async def update(self, job: DataJob) -> DataJob: ...

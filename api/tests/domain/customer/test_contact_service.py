@@ -33,7 +33,10 @@ class TestContactService:
         contact = Contact(customer_id=customer_id, name="John")
         mock_contact_repo.create.return_value = contact
         result = await contact_service.create_contact(
-            customer_id=customer_id, name="John", tenant_id=uid, created_by=uid,
+            customer_id=customer_id,
+            name="John",
+            tenant_id=uid,
+            created_by=uid,
         )
         assert result.name == "John"
 
@@ -42,7 +45,10 @@ class TestContactService:
         mock_customer_repo.get_by_id.return_value = None
         with pytest.raises(CustomerNotFoundError):
             await contact_service.create_contact(
-                customer_id=uuid.uuid7(), name="John", tenant_id=uid, created_by=uid,
+                customer_id=uuid.uuid7(),
+                name="John",
+                tenant_id=uid,
+                created_by=uid,
             )
 
     async def test_create_first_contact_auto_primary(self, contact_service, mock_contact_repo, mock_customer_repo):
@@ -51,12 +57,17 @@ class TestContactService:
         mock_customer_repo.get_by_id.return_value = Customer(name="Acme", tenant_id=uid)
         mock_contact_repo.get_by_customer_id.return_value = []  # no existing contacts
         captured = {}
+
         async def capture(contact):
             captured["is_primary"] = contact.is_primary
             return contact
+
         mock_contact_repo.create.side_effect = capture
         await contact_service.create_contact(
-            customer_id=customer_id, name="First", tenant_id=uid, created_by=uid,
+            customer_id=customer_id,
+            name="First",
+            tenant_id=uid,
+            created_by=uid,
         )
         assert captured["is_primary"] is True
 
@@ -90,9 +101,7 @@ class TestContactService:
         with pytest.raises(ContactNotFoundError):
             await contact_service.soft_delete_contact(tenant_id=uid, contact_id=uuid.uuid7())
 
-    async def test_create_contact_second_not_auto_primary(
-        self, contact_service, mock_contact_repo, mock_customer_repo
-    ):
+    async def test_create_contact_second_not_auto_primary(self, contact_service, mock_contact_repo, mock_customer_repo):
         uid = uuid.uuid7()
         customer_id = uuid.uuid7()
         mock_customer_repo.get_by_id.return_value = Customer(name="Acme", tenant_id=uid)
@@ -107,6 +116,9 @@ class TestContactService:
 
         mock_contact_repo.create.side_effect = capture
         await contact_service.create_contact(
-            customer_id=customer_id, name="Second", tenant_id=uid, created_by=uid,
+            customer_id=customer_id,
+            name="Second",
+            tenant_id=uid,
+            created_by=uid,
         )
         assert captured["is_primary"] is False

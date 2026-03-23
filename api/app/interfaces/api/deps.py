@@ -6,13 +6,23 @@ from fastapi.security import OAuth2PasswordBearer
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
+from app.application.customer.export_service import CustomerExportService
+from app.application.customer.import_service import CustomerImportService
+from app.application.customer.queries import Customer360QueryService
 from app.application.shared.task_queue import AbstractTaskQueue
 from app.application.shared.unit_of_work import AbstractUnitOfWork
 from app.config.settings import Settings, get_settings
 from app.domain.auth.entities import User
 from app.domain.auth.services import AuthConfig, AuthService
 from app.domain.auth.value_objects import Token
-from app.domain.customer.services import ContactService, CustomerGradeService, CustomerService, TagService
+from app.domain.customer.services import (
+    ContactService,
+    CustomerGradeService,
+    CustomerService,
+    DuplicateChecker,
+    SavedViewService,
+    TagService,
+)
 from app.infra.auth.token_blacklist import TokenBlacklist
 from app.infra.cache.redis_client import redis_client
 from app.infra.database.connection import async_session_factory, engine
@@ -22,6 +32,8 @@ from app.infra.database.repositories.customer_repository import (
     CustomerRepository,
     TagRepository,
 )
+from app.infra.database.repositories.data_job_repository import DataJobRepository
+from app.infra.database.repositories.saved_view_repository import SavedViewRepository
 from app.infra.database.repositories.user_repository import UserRepository
 from app.infra.database.unit_of_work import SqlAlchemyUnitOfWork
 from app.infra.queue import task_queue
@@ -128,3 +140,50 @@ def get_contact_service(session: AsyncSession = Depends(get_db)) -> ContactServi
 
 def get_tag_service(session: AsyncSession = Depends(get_db)) -> TagService:
     return TagService(tag_repo=TagRepository(session))
+
+
+def get_duplicate_checker(session: AsyncSession = Depends(get_db)) -> DuplicateChecker:
+    return DuplicateChecker(customer_repo=CustomerRepository(session))
+
+
+def get_360_query_service(session: AsyncSession = Depends(get_db)) -> Customer360QueryService:
+    return Customer360QueryService(
+        customer_repo=CustomerRepository(session),
+        contact_repo=ContactRepository(session),
+        grade_repo=CustomerGradeRepository(session),
+        tag_repo=TagRepository(session),
+    )
+
+
+def get_saved_view_service(session: AsyncSession = Depends(get_db)) -> SavedViewService:
+    return SavedViewService(repo=SavedViewRepository(session))
+
+
+def get_data_job_repo(session: AsyncSession = Depends(get_db)) -> DataJobRepository:
+    return DataJobRepository(session)
+
+
+def get_import_service(
+    session: AsyncSession = Depends(get_db),
+    task_queue_dep: AbstractTaskQueue = Depends(get_task_queue),
+) -> CustomerImportService:
+    return CustomerImportService(
+        job_repo=DataJobRepository(session),
+        customer_repo=CustomerRepository(session),
+        contact_repo=ContactRepository(session),
+        duplicate_checker=DuplicateChecker(customer_repo=CustomerRepository(session)),
+        task_queue=task_queue_dep,
+    )
+
+
+def get_export_service(
+    session: AsyncSession = Depends(get_db),
+    task_queue_dep: AbstractTaskQueue = Depends(get_task_queue),
+) -> CustomerExportService:
+    return CustomerExportService(
+        job_repo=DataJobRepository(session),
+        customer_repo=CustomerRepository(session),
+        contact_repo=ContactRepository(session),
+        grade_repo=CustomerGradeRepository(session),
+        task_queue=task_queue_dep,
+    )
