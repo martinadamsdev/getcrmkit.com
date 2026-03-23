@@ -25,6 +25,14 @@ from app.domain.customer.services import (
     TagService,
 )
 from app.domain.follow_up.services import FollowUpService, ScriptTemplateService
+from app.domain.product.services import (
+    CustomizationOptionService,
+    PricingService,
+    PricingTierService,
+    ProductCategoryService,
+    ProductService,
+    ProductVariantService,
+)
 from app.infra.auth.token_blacklist import TokenBlacklist
 from app.infra.cache.redis_client import redis_client
 from app.infra.database.connection import async_session_factory, engine
@@ -34,8 +42,13 @@ from app.infra.database.repositories.customer_repository import (
     CustomerRepository,
     TagRepository,
 )
+from app.infra.database.repositories.customization_option_repository import CustomizationOptionRepository
 from app.infra.database.repositories.data_job_repository import DataJobRepository
 from app.infra.database.repositories.follow_up_repository import FollowUpRepository, ScriptTemplateRepository
+from app.infra.database.repositories.pricing_tier_repository import PricingTierRepository
+from app.infra.database.repositories.product_category_repository import ProductCategoryRepository
+from app.infra.database.repositories.product_repository import ProductRepository
+from app.infra.database.repositories.product_variant_repository import ProductVariantRepository
 from app.infra.database.repositories.saved_view_repository import SavedViewRepository
 from app.infra.database.repositories.user_repository import UserRepository
 from app.infra.database.unit_of_work import SqlAlchemyUnitOfWork
@@ -205,3 +218,33 @@ def get_follow_up_handler(session: AsyncSession = Depends(get_db)) -> CreateFoll
 
 def get_script_template_service(session: AsyncSession = Depends(get_db)) -> ScriptTemplateService:
     return ScriptTemplateService(template_repo=ScriptTemplateRepository(session))
+
+
+# --- Product ---
+
+
+def get_product_service(session: AsyncSession = Depends(get_db)) -> ProductService:
+    return ProductService(product_repo=ProductRepository(session))
+
+
+def get_product_variant_service(session: AsyncSession = Depends(get_db)) -> ProductVariantService:
+    return ProductVariantService(
+        variant_repo=ProductVariantRepository(session),
+        product_repo=ProductRepository(session),
+    )
+
+
+def get_product_category_service(session: AsyncSession = Depends(get_db)) -> ProductCategoryService:
+    return ProductCategoryService(category_repo=ProductCategoryRepository(session))
+
+
+def get_pricing_tier_service(session: AsyncSession = Depends(get_db)) -> PricingTierService:
+    return PricingTierService(pricing_tier_repo=PricingTierRepository(session))
+
+
+def get_pricing_service(session: AsyncSession = Depends(get_db)) -> PricingService:
+    return PricingService(pricing_tier_repo=PricingTierRepository(session))
+
+
+def get_customization_option_service(session: AsyncSession = Depends(get_db)) -> CustomizationOptionService:
+    return CustomizationOptionService(option_repo=CustomizationOptionRepository(session))

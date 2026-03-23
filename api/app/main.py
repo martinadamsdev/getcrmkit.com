@@ -8,10 +8,15 @@ from app.interfaces.api.v1.auth import router as auth_router
 from app.interfaces.api.v1.contacts import router as contacts_router
 from app.interfaces.api.v1.customer_grades import router as customer_grades_router
 from app.interfaces.api.v1.customers import router as customers_router
+from app.interfaces.api.v1.customization_options import router as customization_options_router
 from app.interfaces.api.v1.data_jobs import router as data_jobs_router
 from app.interfaces.api.v1.follow_ups import router as follow_ups_router
-from app.interfaces.api.v1.script_templates import router as script_templates_router
+from app.interfaces.api.v1.pricing_tiers import router as pricing_tiers_router
+from app.interfaces.api.v1.product_categories import router as product_categories_router
+from app.interfaces.api.v1.product_variants import router as product_variants_router
+from app.interfaces.api.v1.products import router as products_router
 from app.interfaces.api.v1.saved_views import router as saved_views_router
+from app.interfaces.api.v1.script_templates import router as script_templates_router
 from app.interfaces.api.v1.system import router as system_router
 from app.interfaces.api.v1.tags import customer_tags_router
 from app.interfaces.api.v1.tags import router as tags_router
@@ -41,6 +46,11 @@ def create_app() -> FastAPI:
     app.include_router(data_jobs_router)
     app.include_router(follow_ups_router)
     app.include_router(script_templates_router)
+    app.include_router(products_router)
+    app.include_router(product_variants_router)
+    app.include_router(product_categories_router)
+    app.include_router(pricing_tiers_router)
+    app.include_router(customization_options_router)
     return app
 
 
