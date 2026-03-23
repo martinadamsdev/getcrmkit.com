@@ -192,8 +192,8 @@ class CustomerRepository(AbstractCustomerRepository):
 
         # Sort
         sort_col = SORT_COLUMNS.get(filters.sort_by if filters else "created_at", CustomerModel.created_at)
-        sort_order = filters.sort_order if filters else "desc"
-        order_clause = sort_col.asc() if sort_order == "asc" else sort_col.desc()  # type: ignore[attr-defined]
+        sort = filters.sort if filters else "desc"
+        order_clause = sort_col.asc() if sort == "asc" else sort_col.desc()  # type: ignore[attr-defined]
 
         stmt = (
             select(CustomerModel)

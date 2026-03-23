@@ -24,7 +24,7 @@ class CustomerFilter:
     last_follow_at_from: datetime | None = None
     last_follow_at_to: datetime | None = None
     sort_by: Literal["created_at", "name", "last_follow_at"] = "created_at"
-    sort_order: Literal["asc", "desc"] = "desc"
+    sort: Literal["asc", "desc"] = "desc"
 
 
 @dataclass(frozen=True)

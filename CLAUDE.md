@@ -146,6 +146,7 @@ async def create(uow: AbstractUnitOfWork = Depends(get_uow)):
 - **Multi-currency**: store `amount` + `currency` + `exchange_rate` + `amount_base` (RMB base)
 - **Timestamps**: All `TIMESTAMPTZ` in UTC; frontend converts to user timezone
 - **Custom fields**: JSONB columns for extensibility
+- **Sort fields**: `position: int` for entity ordering (not `sort_order`); `sort: Literal["asc", "desc"]` for query direction (not `sort_order`)
 - **Full-text search**: pg_trgm extension + GIN indexes
 
 ## Domain-Specific Concepts

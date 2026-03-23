@@ -44,7 +44,7 @@ class TestCustomerFilter:
 
     async def test_sort_by_name_asc(self, authenticated_client: AsyncClient):
         await self._seed_customers(authenticated_client)
-        response = await authenticated_client.get("/api/v1/customers?sort_by=name&sort_order=asc")
+        response = await authenticated_client.get("/api/v1/customers?sort_by=name&sort=asc")
         assert response.status_code == 200
         data = response.json()
         names = [item["name"] for item in data["items"]]

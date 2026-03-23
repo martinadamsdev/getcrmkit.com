@@ -176,7 +176,7 @@ class TestCustomerRepoFilter:
         await repo.create(make_customer(tenant_id, name="Alice"))
         await repo.create(make_customer(tenant_id, name="Bob"))
 
-        filters = CustomerFilter(sort_by="name", sort_order="asc")
+        filters = CustomerFilter(sort_by="name", sort="asc")
         items, total = await repo.get_by_tenant(tenant_id, page=1, page_size=10, filters=filters)
         assert total == 3
         assert [c.name for c in items] == ["Alice", "Bob", "Charlie"]

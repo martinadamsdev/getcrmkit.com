@@ -21,7 +21,7 @@ class TestCustomerFilter:
         assert f.last_follow_at_from is None
         assert f.last_follow_at_to is None
         assert f.sort_by == "created_at"
-        assert f.sort_order == "desc"
+        assert f.sort == "desc"
 
     def test_frozen_immutable(self):
         f = CustomerFilter()
@@ -49,13 +49,13 @@ class TestCustomerFilter:
             last_follow_at_from=now,
             last_follow_at_to=now,
             sort_by="name",
-            sort_order="asc",
+            sort="asc",
         )
         assert f.keyword == "acme"
         assert f.grade_id == grade_id
         assert f.tag_ids == [tag_id]
         assert f.sort_by == "name"
-        assert f.sort_order == "asc"
+        assert f.sort == "asc"
 
 
 class TestDuplicateMatch:

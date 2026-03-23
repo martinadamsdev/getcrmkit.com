@@ -213,7 +213,7 @@ async def list_customers(
     tag_ids: list[uuid.UUID] | None = Query(default=None),
     owner_id: uuid.UUID | None = None,
     sort_by: Literal["created_at", "name", "last_follow_at"] = "created_at",
-    sort_order: Literal["asc", "desc"] = "desc",
+    sort: Literal["asc", "desc"] = "desc",
     current_user: User = Depends(get_current_user),
     service: CustomerService = Depends(get_customer_service),
 ) -> PaginatedResponse[CustomerResponse]:
@@ -221,7 +221,7 @@ async def list_customers(
     if (
         any([keyword, grade_id, source, follow_status, country, industry, tag_ids, owner_id])
         or sort_by != "created_at"
-        or sort_order != "desc"
+        or sort != "desc"
     ):
         filters = CustomerFilter(
             keyword=keyword,
@@ -233,7 +233,7 @@ async def list_customers(
             tag_ids=tag_ids or [],
             owner_id=owner_id,
             sort_by=sort_by,
-            sort_order=sort_order,
+            sort=sort,
         )
     items, total = await service.list_customers(current_user.tenant_id, page, page_size, filters=filters)
     return PaginatedResponse(
@@ -362,3 +362,20 @@ async def delete_customer(
         await session.commit()
     except CustomerNotFoundError as e:
         raise HTTPException(status_code=404, detail={"code": e.code, "message": e.message}) from e
+
+
+@router.get("/{customer_id}/timeline")
+async def get_customer_timeline(
+    customer_id: uuid.UUID,
+    page: int = 1,
+    page_size: int = 20,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> PaginatedResponse[dict[str, object]]:
+    from app.application.follow_up.queries import TimelineQueryService
+
+    service = TimelineQueryService(session)
+    items, total = await service.get_timeline(
+        customer_id, current_user.tenant_id, page=page, page_size=page_size
+    )
+    return PaginatedResponse(items=items, total=total, page=page, page_size=page_size)
