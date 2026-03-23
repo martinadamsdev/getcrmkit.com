@@ -1,6 +1,7 @@
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Any
 
 
 @dataclass
@@ -12,6 +13,7 @@ class BaseEntity:
     deleted_at: datetime | None = field(default=None)
     created_by: uuid.UUID | None = field(default=None)
     updated_by: uuid.UUID | None = field(default=None)
+    _events: list[Any] = field(default_factory=list, init=False, repr=False, compare=False)
 
     @property
     def is_deleted(self) -> bool:
@@ -19,3 +21,11 @@ class BaseEntity:
 
     def soft_delete(self) -> None:
         self.deleted_at = datetime.now(UTC)
+
+    def add_event(self, event: Any) -> None:
+        self._events.append(event)
+
+    def pull_events(self) -> list[Any]:
+        events = list(self._events)
+        self._events.clear()
+        return events

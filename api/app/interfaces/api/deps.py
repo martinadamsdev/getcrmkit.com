@@ -12,9 +12,16 @@ from app.config.settings import Settings, get_settings
 from app.domain.auth.entities import User
 from app.domain.auth.services import AuthConfig, AuthService
 from app.domain.auth.value_objects import Token
+from app.domain.customer.services import ContactService, CustomerGradeService, CustomerService, TagService
 from app.infra.auth.token_blacklist import TokenBlacklist
 from app.infra.cache.redis_client import redis_client
 from app.infra.database.connection import async_session_factory, engine
+from app.infra.database.repositories.customer_repository import (
+    ContactRepository,
+    CustomerGradeRepository,
+    CustomerRepository,
+    TagRepository,
+)
 from app.infra.database.repositories.user_repository import UserRepository
 from app.infra.database.unit_of_work import SqlAlchemyUnitOfWork
 from app.infra.queue import task_queue
@@ -100,3 +107,24 @@ async def get_current_user(
         raise HTTPException(status_code=403, detail={"code": "USER_INACTIVE", "message": "Account is inactive"})
 
     return user
+
+
+def get_grade_service(session: AsyncSession = Depends(get_db)) -> CustomerGradeService:
+    grade_repo = CustomerGradeRepository(session)
+    customer_repo = CustomerRepository(session)
+    return CustomerGradeService(grade_repo=grade_repo, customer_repo=customer_repo)
+
+
+def get_customer_service(session: AsyncSession = Depends(get_db)) -> CustomerService:
+    return CustomerService(customer_repo=CustomerRepository(session))
+
+
+def get_contact_service(session: AsyncSession = Depends(get_db)) -> ContactService:
+    return ContactService(
+        contact_repo=ContactRepository(session),
+        customer_repo=CustomerRepository(session),
+    )
+
+
+def get_tag_service(session: AsyncSession = Depends(get_db)) -> TagService:
+    return TagService(tag_repo=TagRepository(session))
