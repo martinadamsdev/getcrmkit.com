@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
+from app.application.shared.task_queue import AbstractTaskQueue
 from app.application.shared.unit_of_work import AbstractUnitOfWork
 from app.config.settings import Settings, get_settings
 from app.domain.auth.entities import User
@@ -16,6 +17,7 @@ from app.infra.cache.redis_client import redis_client
 from app.infra.database.connection import async_session_factory, engine
 from app.infra.database.repositories.user_repository import UserRepository
 from app.infra.database.unit_of_work import SqlAlchemyUnitOfWork
+from app.infra.queue import task_queue
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
@@ -36,6 +38,10 @@ def get_engine() -> AsyncEngine:
 
 def get_redis() -> Redis:
     return redis_client
+
+
+def get_task_queue() -> AbstractTaskQueue:
+    return task_queue
 
 
 def get_token_blacklist(redis: Redis = Depends(get_redis)) -> TokenBlacklist:

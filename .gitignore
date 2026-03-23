@@ -36,3 +36,6 @@ docs/
 
 # OS
 Thumbs.db
+
+# Git worktrees
+.worktrees/

@@ -23,3 +23,7 @@ make quality  # ruff + mypy
 - `application/` → abstract interfaces only (no SQLAlchemy/Redis)
 - `infra/` → concrete implementations
 - `interfaces/api/deps.py` → wires infra into abstractions via Depends()
+
+## Database Conventions
+
+- **No PostgreSQL ENUM types** — use `VARCHAR` for enum-like columns (e.g. `follow_status VARCHAR(50)`). Domain-layer `StrEnum` enforces valid values; DB ENUMs require `ALTER TYPE` to add values and create unnecessary migration complexity.

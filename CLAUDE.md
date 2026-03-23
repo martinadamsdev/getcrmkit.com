@@ -171,6 +171,16 @@ async def create(uow: AbstractUnitOfWork = Depends(get_uow)):
 | `docs/seo.md` | SEO strategy for marketing site |
 | `docs/domain.md` | Brand and deployment strategy |
 
+## Git Branching Rules
+
+- **main must be a straight line** — never use `git merge --no-ff`. Always rebase feature branches onto main, then fast-forward merge:
+  ```bash
+  git checkout -b temp <feature-tip>
+  git rebase main
+  git checkout main && git merge --ff-only temp
+  git branch -D temp
+  ```
+
 ## Commit Convention
 
 Format: `<gitmoji> <description>`

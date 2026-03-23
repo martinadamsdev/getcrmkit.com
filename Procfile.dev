@@ -1,3 +1,4 @@
 api: cd api && make dev
+worker: cd api && make worker
 console: cd web/apps/console && bun run dev
 website: cd web/apps/website && bun run dev

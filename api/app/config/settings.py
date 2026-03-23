@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # Redis
     redis_url: str = "redis://localhost:16379/0"
 
+    # Worker
+    worker_concurrency: int = 10
+
     # JWT
     jwt_secret_key: str = "change-me-in-production"
     jwt_algorithm: str = "HS256"

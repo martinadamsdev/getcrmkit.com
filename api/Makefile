@@ -1,4 +1,4 @@
-.PHONY: setup reset dev install test test-cov test-v lint format typecheck quality migrate migration migrate-down up down logs
+.PHONY: setup reset dev worker install test test-cov test-v lint format typecheck quality migrate migration migrate-down up down logs
 
 COMPOSE := docker compose
 
@@ -13,6 +13,9 @@ reset:
 
 dev:
 	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+worker:
+	uv run saq app.worker.settings
 
 install:
 	uv sync
