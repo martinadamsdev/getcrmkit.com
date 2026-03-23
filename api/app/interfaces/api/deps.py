@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from app.application.customer.export_service import CustomerExportService
 from app.application.customer.import_service import CustomerImportService
 from app.application.customer.queries import Customer360QueryService
+from app.application.follow_up.commands import CreateFollowUpHandler
 from app.application.shared.task_queue import AbstractTaskQueue
 from app.application.shared.unit_of_work import AbstractUnitOfWork
 from app.config.settings import Settings, get_settings
@@ -23,6 +24,7 @@ from app.domain.customer.services import (
     SavedViewService,
     TagService,
 )
+from app.domain.follow_up.services import FollowUpService, ScriptTemplateService
 from app.infra.auth.token_blacklist import TokenBlacklist
 from app.infra.cache.redis_client import redis_client
 from app.infra.database.connection import async_session_factory, engine
@@ -33,6 +35,7 @@ from app.infra.database.repositories.customer_repository import (
     TagRepository,
 )
 from app.infra.database.repositories.data_job_repository import DataJobRepository
+from app.infra.database.repositories.follow_up_repository import FollowUpRepository, ScriptTemplateRepository
 from app.infra.database.repositories.saved_view_repository import SavedViewRepository
 from app.infra.database.repositories.user_repository import UserRepository
 from app.infra.database.unit_of_work import SqlAlchemyUnitOfWork
@@ -187,3 +190,18 @@ def get_export_service(
         grade_repo=CustomerGradeRepository(session),
         task_queue=task_queue_dep,
     )
+
+
+def get_follow_up_service(session: AsyncSession = Depends(get_db)) -> FollowUpService:
+    return FollowUpService(follow_up_repo=FollowUpRepository(session))
+
+
+def get_follow_up_handler(session: AsyncSession = Depends(get_db)) -> CreateFollowUpHandler:
+    return CreateFollowUpHandler(
+        follow_up_service=FollowUpService(follow_up_repo=FollowUpRepository(session)),
+        customer_repo=CustomerRepository(session),
+    )
+
+
+def get_script_template_service(session: AsyncSession = Depends(get_db)) -> ScriptTemplateService:
+    return ScriptTemplateService(template_repo=ScriptTemplateRepository(session))

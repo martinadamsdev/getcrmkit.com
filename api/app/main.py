@@ -9,6 +9,8 @@ from app.interfaces.api.v1.contacts import router as contacts_router
 from app.interfaces.api.v1.customer_grades import router as customer_grades_router
 from app.interfaces.api.v1.customers import router as customers_router
 from app.interfaces.api.v1.data_jobs import router as data_jobs_router
+from app.interfaces.api.v1.follow_ups import router as follow_ups_router
+from app.interfaces.api.v1.script_templates import router as script_templates_router
 from app.interfaces.api.v1.saved_views import router as saved_views_router
 from app.interfaces.api.v1.system import router as system_router
 from app.interfaces.api.v1.tags import customer_tags_router
@@ -37,6 +39,8 @@ def create_app() -> FastAPI:
     app.include_router(contacts_router)
     app.include_router(saved_views_router)
     app.include_router(data_jobs_router)
+    app.include_router(follow_ups_router)
+    app.include_router(script_templates_router)
     return app
 
 
