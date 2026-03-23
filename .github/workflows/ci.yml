@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  api:
+    name: API — lint + type + test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: crmkit
+          POSTGRES_USER: crmkit
+          POSTGRES_PASSWORD: crmkit
+        ports:
+          - 15432:5432
+        options: >-
+          --health-cmd "pg_isready -U crmkit"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:8
+        ports:
+          - 16379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python 3.14
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        working-directory: api
+        run: uv sync
+
+      - name: Ruff lint
+        working-directory: api
+        run: uv run ruff check src tests
+
+      - name: Ruff format check
+        working-directory: api
+        run: uv run ruff format --check src tests
+
+      - name: Mypy
+        working-directory: api
+        run: uv run mypy src
+
+      - name: Alembic migrations
+        working-directory: api
+        env:
+          DATABASE_URL: postgresql+asyncpg://crmkit:crmkit@localhost:15432/crmkit
+          DATABASE_URL_SYNC: postgresql://crmkit:crmkit@localhost:15432/crmkit
+          REDIS_URL: redis://localhost:16379/0
+        run: uv run alembic upgrade head
+
+      - name: Pytest
+        working-directory: api
+        env:
+          DATABASE_URL: postgresql+asyncpg://crmkit:crmkit@localhost:15432/crmkit
+          REDIS_URL: redis://localhost:16379/0
+        run: uv run pytest -v
+
+  frontend:
+    name: Frontend — install + check + typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        working-directory: web
+        run: bun install
+
+      - name: Biome check
+        working-directory: web
+        run: bun run check
+
+      - name: TypeScript check
+        working-directory: web
+        run: bun run typecheck

@@ -1,0 +1,3 @@
+api: cd api && make dev
+console: cd web/apps/console && bun run dev
+website: cd web/apps/website && bun run dev

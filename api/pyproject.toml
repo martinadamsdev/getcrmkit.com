@@ -1,0 +1,61 @@
+[project]
+name = "crmkit-api"
+version = "0.1.0"
+description = "Get CRM Kit API — Open-source CRM for international trade SOHO"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.135",
+    "uvicorn[standard]>=0.34",
+    "pydantic>=2.12",
+    "pydantic-settings>=2.7",
+    "sqlalchemy>=2.0",
+    "asyncpg>=0.30",
+    "alembic>=1.14",
+    "redis[hiredis]>=5.2",
+    "arq>=0.26",
+    "PyJWT[crypto]>=2.10",
+    "bcrypt>=4.2",
+    "python-multipart>=0.0.9",
+    "boto3>=1.35",
+    "openpyxl>=3.1",
+    "greenlet>=3.3.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",
+    "ruff>=0.15",
+    "mypy>=1.14",
+    "pytest-cov>=6.0",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 120
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "B", "SIM"]
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"

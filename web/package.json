@@ -1,0 +1,20 @@
+{
+  "name": "@getcrmkit/web",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:console": "bun run --filter console dev",
+    "dev:website": "bun run --filter website dev",
+    "build": "bun run --filter '*' build",
+    "check": "biome check .",
+    "check:fix": "biome check --fix .",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "typecheck": "bun run --filter '*' typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.8",
+    "shadcn": "^4.1.0",
+    "typescript": "5.9.3"
+  }
+}

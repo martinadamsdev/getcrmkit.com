@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Node / Bun
+node_modules/
+.next/
+.vinxi/
+.output/
+dist/
+bun.lock
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+pgdata/
+
+# Docs (private)
+docs/
+
+# OS
+Thumbs.db
