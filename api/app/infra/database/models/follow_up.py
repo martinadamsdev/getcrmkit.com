@@ -12,7 +12,9 @@ class FollowUpModel(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
     tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
-    customer_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False)
+    customer_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False
+    )
     contact_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid, ForeignKey("contacts.id", ondelete="SET NULL"), nullable=True
     )
@@ -55,7 +57,9 @@ class NotificationModel(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
     tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
-    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     type: Mapped[str] = mapped_column(String(50), nullable=False)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)

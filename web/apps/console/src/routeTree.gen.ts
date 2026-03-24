@@ -9,50 +9,614 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
+import { Route as AuthLoginRouteImport } from './routes/_auth.login'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppQuotationsRouteImport } from './routes/_app.quotations'
+import { Route as AppProductsRouteImport } from './routes/_app.products'
+import { Route as AppOrdersRouteImport } from './routes/_app.orders'
+import { Route as AppFollowUpsRouteImport } from './routes/_app.follow-ups'
+import { Route as AppCustomersRouteImport } from './routes/_app.customers'
+import { Route as AppQuotationsIndexRouteImport } from './routes/_app.quotations.index'
+import { Route as AppProductsIndexRouteImport } from './routes/_app.products.index'
+import { Route as AppOrdersIndexRouteImport } from './routes/_app.orders.index'
+import { Route as AppFollowUpsIndexRouteImport } from './routes/_app.follow-ups.index'
+import { Route as AppCustomersIndexRouteImport } from './routes/_app.customers.index'
+import { Route as AppSettingsTemplatesRouteImport } from './routes/_app.settings.templates'
+import { Route as AppSettingsProfileRouteImport } from './routes/_app.settings.profile'
+import { Route as AppSettingsCustomFieldsRouteImport } from './routes/_app.settings.custom-fields'
+import { Route as AppSettingsCompanyRouteImport } from './routes/_app.settings.company'
+import { Route as AppQuotationsNewRouteImport } from './routes/_app.quotations.new'
+import { Route as AppQuotationsIdRouteImport } from './routes/_app.quotations.$id'
+import { Route as AppProductsIdRouteImport } from './routes/_app.products.$id'
+import { Route as AppOrdersIdRouteImport } from './routes/_app.orders.$id'
+import { Route as AppCustomersIdRouteImport } from './routes/_app.customers.$id'
 
-const IndexRoute = IndexRouteImport.update({
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
+} as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQuotationsRoute = AppQuotationsRouteImport.update({
+  id: '/quotations',
+  path: '/quotations',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProductsRoute = AppProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOrdersRoute = AppOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFollowUpsRoute = AppFollowUpsRouteImport.update({
+  id: '/follow-ups',
+  path: '/follow-ups',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCustomersRoute = AppCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQuotationsIndexRoute = AppQuotationsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppQuotationsRoute,
+} as any)
+const AppProductsIndexRoute = AppProductsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppProductsRoute,
+} as any)
+const AppOrdersIndexRoute = AppOrdersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppOrdersRoute,
+} as any)
+const AppFollowUpsIndexRoute = AppFollowUpsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppFollowUpsRoute,
+} as any)
+const AppCustomersIndexRoute = AppCustomersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppCustomersRoute,
+} as any)
+const AppSettingsTemplatesRoute = AppSettingsTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSettingsProfileRoute = AppSettingsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSettingsCustomFieldsRoute = AppSettingsCustomFieldsRouteImport.update({
+  id: '/custom-fields',
+  path: '/custom-fields',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSettingsCompanyRoute = AppSettingsCompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppQuotationsNewRoute = AppQuotationsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AppQuotationsRoute,
+} as any)
+const AppQuotationsIdRoute = AppQuotationsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppQuotationsRoute,
+} as any)
+const AppProductsIdRoute = AppProductsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppProductsRoute,
+} as any)
+const AppOrdersIdRoute = AppOrdersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppOrdersRoute,
+} as any)
+const AppCustomersIdRoute = AppCustomersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppCustomersRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/customers': typeof AppCustomersRouteWithChildren
+  '/follow-ups': typeof AppFollowUpsRouteWithChildren
+  '/orders': typeof AppOrdersRouteWithChildren
+  '/products': typeof AppProductsRouteWithChildren
+  '/quotations': typeof AppQuotationsRouteWithChildren
+  '/settings': typeof AppSettingsRouteWithChildren
+  '/login': typeof AuthLoginRoute
+  '/register': typeof AuthRegisterRoute
+  '/customers/$id': typeof AppCustomersIdRoute
+  '/orders/$id': typeof AppOrdersIdRoute
+  '/products/$id': typeof AppProductsIdRoute
+  '/quotations/$id': typeof AppQuotationsIdRoute
+  '/quotations/new': typeof AppQuotationsNewRoute
+  '/settings/company': typeof AppSettingsCompanyRoute
+  '/settings/custom-fields': typeof AppSettingsCustomFieldsRoute
+  '/settings/profile': typeof AppSettingsProfileRoute
+  '/settings/templates': typeof AppSettingsTemplatesRoute
+  '/customers/': typeof AppCustomersIndexRoute
+  '/follow-ups/': typeof AppFollowUpsIndexRoute
+  '/orders/': typeof AppOrdersIndexRoute
+  '/products/': typeof AppProductsIndexRoute
+  '/quotations/': typeof AppQuotationsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/settings': typeof AppSettingsRouteWithChildren
+  '/login': typeof AuthLoginRoute
+  '/register': typeof AuthRegisterRoute
+  '/customers/$id': typeof AppCustomersIdRoute
+  '/orders/$id': typeof AppOrdersIdRoute
+  '/products/$id': typeof AppProductsIdRoute
+  '/quotations/$id': typeof AppQuotationsIdRoute
+  '/quotations/new': typeof AppQuotationsNewRoute
+  '/settings/company': typeof AppSettingsCompanyRoute
+  '/settings/custom-fields': typeof AppSettingsCustomFieldsRoute
+  '/settings/profile': typeof AppSettingsProfileRoute
+  '/settings/templates': typeof AppSettingsTemplatesRoute
+  '/customers': typeof AppCustomersIndexRoute
+  '/follow-ups': typeof AppFollowUpsIndexRoute
+  '/orders': typeof AppOrdersIndexRoute
+  '/products': typeof AppProductsIndexRoute
+  '/quotations': typeof AppQuotationsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_auth': typeof AuthRouteWithChildren
+  '/_app/customers': typeof AppCustomersRouteWithChildren
+  '/_app/follow-ups': typeof AppFollowUpsRouteWithChildren
+  '/_app/orders': typeof AppOrdersRouteWithChildren
+  '/_app/products': typeof AppProductsRouteWithChildren
+  '/_app/quotations': typeof AppQuotationsRouteWithChildren
+  '/_app/settings': typeof AppSettingsRouteWithChildren
+  '/_auth/login': typeof AuthLoginRoute
+  '/_auth/register': typeof AuthRegisterRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/customers/$id': typeof AppCustomersIdRoute
+  '/_app/orders/$id': typeof AppOrdersIdRoute
+  '/_app/products/$id': typeof AppProductsIdRoute
+  '/_app/quotations/$id': typeof AppQuotationsIdRoute
+  '/_app/quotations/new': typeof AppQuotationsNewRoute
+  '/_app/settings/company': typeof AppSettingsCompanyRoute
+  '/_app/settings/custom-fields': typeof AppSettingsCustomFieldsRoute
+  '/_app/settings/profile': typeof AppSettingsProfileRoute
+  '/_app/settings/templates': typeof AppSettingsTemplatesRoute
+  '/_app/customers/': typeof AppCustomersIndexRoute
+  '/_app/follow-ups/': typeof AppFollowUpsIndexRoute
+  '/_app/orders/': typeof AppOrdersIndexRoute
+  '/_app/products/': typeof AppProductsIndexRoute
+  '/_app/quotations/': typeof AppQuotationsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/customers'
+    | '/follow-ups'
+    | '/orders'
+    | '/products'
+    | '/quotations'
+    | '/settings'
+    | '/login'
+    | '/register'
+    | '/customers/$id'
+    | '/orders/$id'
+    | '/products/$id'
+    | '/quotations/$id'
+    | '/quotations/new'
+    | '/settings/company'
+    | '/settings/custom-fields'
+    | '/settings/profile'
+    | '/settings/templates'
+    | '/customers/'
+    | '/follow-ups/'
+    | '/orders/'
+    | '/products/'
+    | '/quotations/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/settings'
+    | '/login'
+    | '/register'
+    | '/customers/$id'
+    | '/orders/$id'
+    | '/products/$id'
+    | '/quotations/$id'
+    | '/quotations/new'
+    | '/settings/company'
+    | '/settings/custom-fields'
+    | '/settings/profile'
+    | '/settings/templates'
+    | '/customers'
+    | '/follow-ups'
+    | '/orders'
+    | '/products'
+    | '/quotations'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_auth'
+    | '/_app/customers'
+    | '/_app/follow-ups'
+    | '/_app/orders'
+    | '/_app/products'
+    | '/_app/quotations'
+    | '/_app/settings'
+    | '/_auth/login'
+    | '/_auth/register'
+    | '/_app/'
+    | '/_app/customers/$id'
+    | '/_app/orders/$id'
+    | '/_app/products/$id'
+    | '/_app/quotations/$id'
+    | '/_app/quotations/new'
+    | '/_app/settings/company'
+    | '/_app/settings/custom-fields'
+    | '/_app/settings/profile'
+    | '/_app/settings/templates'
+    | '/_app/customers/'
+    | '/_app/follow-ups/'
+    | '/_app/orders/'
+    | '/_app/products/'
+    | '/_app/quotations/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_auth/register': {
+      id: '/_auth/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/quotations': {
+      id: '/_app/quotations'
+      path: '/quotations'
+      fullPath: '/quotations'
+      preLoaderRoute: typeof AppQuotationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/products': {
+      id: '/_app/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof AppProductsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/orders': {
+      id: '/_app/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof AppOrdersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/follow-ups': {
+      id: '/_app/follow-ups'
+      path: '/follow-ups'
+      fullPath: '/follow-ups'
+      preLoaderRoute: typeof AppFollowUpsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/customers': {
+      id: '/_app/customers'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof AppCustomersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/quotations/': {
+      id: '/_app/quotations/'
+      path: '/'
+      fullPath: '/quotations/'
+      preLoaderRoute: typeof AppQuotationsIndexRouteImport
+      parentRoute: typeof AppQuotationsRoute
+    }
+    '/_app/products/': {
+      id: '/_app/products/'
+      path: '/'
+      fullPath: '/products/'
+      preLoaderRoute: typeof AppProductsIndexRouteImport
+      parentRoute: typeof AppProductsRoute
+    }
+    '/_app/orders/': {
+      id: '/_app/orders/'
+      path: '/'
+      fullPath: '/orders/'
+      preLoaderRoute: typeof AppOrdersIndexRouteImport
+      parentRoute: typeof AppOrdersRoute
+    }
+    '/_app/follow-ups/': {
+      id: '/_app/follow-ups/'
+      path: '/'
+      fullPath: '/follow-ups/'
+      preLoaderRoute: typeof AppFollowUpsIndexRouteImport
+      parentRoute: typeof AppFollowUpsRoute
+    }
+    '/_app/customers/': {
+      id: '/_app/customers/'
+      path: '/'
+      fullPath: '/customers/'
+      preLoaderRoute: typeof AppCustomersIndexRouteImport
+      parentRoute: typeof AppCustomersRoute
+    }
+    '/_app/settings/templates': {
+      id: '/_app/settings/templates'
+      path: '/templates'
+      fullPath: '/settings/templates'
+      preLoaderRoute: typeof AppSettingsTemplatesRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/settings/profile': {
+      id: '/_app/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof AppSettingsProfileRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/settings/custom-fields': {
+      id: '/_app/settings/custom-fields'
+      path: '/custom-fields'
+      fullPath: '/settings/custom-fields'
+      preLoaderRoute: typeof AppSettingsCustomFieldsRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/settings/company': {
+      id: '/_app/settings/company'
+      path: '/company'
+      fullPath: '/settings/company'
+      preLoaderRoute: typeof AppSettingsCompanyRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/quotations/new': {
+      id: '/_app/quotations/new'
+      path: '/new'
+      fullPath: '/quotations/new'
+      preLoaderRoute: typeof AppQuotationsNewRouteImport
+      parentRoute: typeof AppQuotationsRoute
+    }
+    '/_app/quotations/$id': {
+      id: '/_app/quotations/$id'
+      path: '/$id'
+      fullPath: '/quotations/$id'
+      preLoaderRoute: typeof AppQuotationsIdRouteImport
+      parentRoute: typeof AppQuotationsRoute
+    }
+    '/_app/products/$id': {
+      id: '/_app/products/$id'
+      path: '/$id'
+      fullPath: '/products/$id'
+      preLoaderRoute: typeof AppProductsIdRouteImport
+      parentRoute: typeof AppProductsRoute
+    }
+    '/_app/orders/$id': {
+      id: '/_app/orders/$id'
+      path: '/$id'
+      fullPath: '/orders/$id'
+      preLoaderRoute: typeof AppOrdersIdRouteImport
+      parentRoute: typeof AppOrdersRoute
+    }
+    '/_app/customers/$id': {
+      id: '/_app/customers/$id'
+      path: '/$id'
+      fullPath: '/customers/$id'
+      preLoaderRoute: typeof AppCustomersIdRouteImport
+      parentRoute: typeof AppCustomersRoute
     }
   }
 }
 
+interface AppCustomersRouteChildren {
+  AppCustomersIdRoute: typeof AppCustomersIdRoute
+  AppCustomersIndexRoute: typeof AppCustomersIndexRoute
+}
+
+const AppCustomersRouteChildren: AppCustomersRouteChildren = {
+  AppCustomersIdRoute: AppCustomersIdRoute,
+  AppCustomersIndexRoute: AppCustomersIndexRoute,
+}
+
+const AppCustomersRouteWithChildren = AppCustomersRoute._addFileChildren(
+  AppCustomersRouteChildren,
+)
+
+interface AppFollowUpsRouteChildren {
+  AppFollowUpsIndexRoute: typeof AppFollowUpsIndexRoute
+}
+
+const AppFollowUpsRouteChildren: AppFollowUpsRouteChildren = {
+  AppFollowUpsIndexRoute: AppFollowUpsIndexRoute,
+}
+
+const AppFollowUpsRouteWithChildren = AppFollowUpsRoute._addFileChildren(
+  AppFollowUpsRouteChildren,
+)
+
+interface AppOrdersRouteChildren {
+  AppOrdersIdRoute: typeof AppOrdersIdRoute
+  AppOrdersIndexRoute: typeof AppOrdersIndexRoute
+}
+
+const AppOrdersRouteChildren: AppOrdersRouteChildren = {
+  AppOrdersIdRoute: AppOrdersIdRoute,
+  AppOrdersIndexRoute: AppOrdersIndexRoute,
+}
+
+const AppOrdersRouteWithChildren = AppOrdersRoute._addFileChildren(
+  AppOrdersRouteChildren,
+)
+
+interface AppProductsRouteChildren {
+  AppProductsIdRoute: typeof AppProductsIdRoute
+  AppProductsIndexRoute: typeof AppProductsIndexRoute
+}
+
+const AppProductsRouteChildren: AppProductsRouteChildren = {
+  AppProductsIdRoute: AppProductsIdRoute,
+  AppProductsIndexRoute: AppProductsIndexRoute,
+}
+
+const AppProductsRouteWithChildren = AppProductsRoute._addFileChildren(
+  AppProductsRouteChildren,
+)
+
+interface AppQuotationsRouteChildren {
+  AppQuotationsIdRoute: typeof AppQuotationsIdRoute
+  AppQuotationsNewRoute: typeof AppQuotationsNewRoute
+  AppQuotationsIndexRoute: typeof AppQuotationsIndexRoute
+}
+
+const AppQuotationsRouteChildren: AppQuotationsRouteChildren = {
+  AppQuotationsIdRoute: AppQuotationsIdRoute,
+  AppQuotationsNewRoute: AppQuotationsNewRoute,
+  AppQuotationsIndexRoute: AppQuotationsIndexRoute,
+}
+
+const AppQuotationsRouteWithChildren = AppQuotationsRoute._addFileChildren(
+  AppQuotationsRouteChildren,
+)
+
+interface AppSettingsRouteChildren {
+  AppSettingsCompanyRoute: typeof AppSettingsCompanyRoute
+  AppSettingsCustomFieldsRoute: typeof AppSettingsCustomFieldsRoute
+  AppSettingsProfileRoute: typeof AppSettingsProfileRoute
+  AppSettingsTemplatesRoute: typeof AppSettingsTemplatesRoute
+}
+
+const AppSettingsRouteChildren: AppSettingsRouteChildren = {
+  AppSettingsCompanyRoute: AppSettingsCompanyRoute,
+  AppSettingsCustomFieldsRoute: AppSettingsCustomFieldsRoute,
+  AppSettingsProfileRoute: AppSettingsProfileRoute,
+  AppSettingsTemplatesRoute: AppSettingsTemplatesRoute,
+}
+
+const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
+  AppSettingsRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppCustomersRoute: typeof AppCustomersRouteWithChildren
+  AppFollowUpsRoute: typeof AppFollowUpsRouteWithChildren
+  AppOrdersRoute: typeof AppOrdersRouteWithChildren
+  AppProductsRoute: typeof AppProductsRouteWithChildren
+  AppQuotationsRoute: typeof AppQuotationsRouteWithChildren
+  AppSettingsRoute: typeof AppSettingsRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCustomersRoute: AppCustomersRouteWithChildren,
+  AppFollowUpsRoute: AppFollowUpsRouteWithChildren,
+  AppOrdersRoute: AppOrdersRouteWithChildren,
+  AppProductsRoute: AppProductsRouteWithChildren,
+  AppQuotationsRoute: AppQuotationsRouteWithChildren,
+  AppSettingsRoute: AppSettingsRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface AuthRouteChildren {
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

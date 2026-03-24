@@ -79,7 +79,9 @@ class FollowUpRepository(AbstractFollowUpRepository):
             from sqlalchemy import Text, cast
             from sqlalchemy.dialects.postgresql import ARRAY as PG_ARRAY
 
-            conditions.append(FollowUpModel.tags.op("&&")(cast(tags, PG_ARRAY(Text))))
+            conditions.append(
+                FollowUpModel.tags.op("&&")(cast(tags, PG_ARRAY(Text)))
+            )
 
         if created_by is not None:
             conditions.append(FollowUpModel.created_by == created_by)
@@ -214,7 +216,11 @@ class ScriptTemplateRepository(AbstractScriptTemplateRepository):
         conditions = [ScriptTemplateModel.tenant_id == tenant_id]
         if scene is not None:
             conditions.append(ScriptTemplateModel.scene == scene)
-        stmt = select(ScriptTemplateModel).where(*conditions).order_by(ScriptTemplateModel.position)
+        stmt = (
+            select(ScriptTemplateModel)
+            .where(*conditions)
+            .order_by(ScriptTemplateModel.position)
+        )
         result = await self._session.execute(stmt)
         return [self._to_entity(m) for m in result.scalars()]
 
@@ -246,7 +252,11 @@ class ScriptTemplateRepository(AbstractScriptTemplateRepository):
         await self._session.flush()
 
     async def count_by_tenant(self, tenant_id: uuid.UUID) -> int:
-        stmt = select(func.count()).select_from(ScriptTemplateModel).where(ScriptTemplateModel.tenant_id == tenant_id)
+        stmt = (
+            select(func.count())
+            .select_from(ScriptTemplateModel)
+            .where(ScriptTemplateModel.tenant_id == tenant_id)
+        )
         result = await self._session.execute(stmt)
         return result.scalar_one()
 
